@@ -1,0 +1,6 @@
+[submodule "mxml"]
+	path = mxml
+	url = https://github.com/iSPIRT/mxml
+[submodule "jsmn"]
+	path = jsmn
+	url = https://github.com/zserge/jsmn
