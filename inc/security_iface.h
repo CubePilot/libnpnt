@@ -52,7 +52,7 @@ void* npnt_set_security_handle(npnt_s *npnt_handle);
  *
  * @iclass security_iface
  */
-int npnt_check_authenticity(npnt_s *npnt_handle, uint8_t* raw_data, uint16_t raw_data_len, uint8_t* signature, uint16_t signature_len);
+int8_t npnt_check_authenticity(npnt_s *npnt_handle, uint8_t* raw_data, uint16_t raw_data_len, uint8_t* signature, uint16_t signature_len);
 
 /**
  * @brief   Signs raw data.
@@ -71,27 +71,23 @@ int npnt_check_authenticity(npnt_s *npnt_handle, uint8_t* raw_data, uint16_t raw
  *
  * @iclass security_iface
  */
-int npnt_sign_raw_data(npnt_s *npnt_handle, uint8_t* raw_data, uint16_t raw_data_len, uint8_t* signature, uint16_t* signature_len);
+int8_t npnt_sign_raw_data(npnt_s *npnt_handle, uint8_t* raw_data, uint16_t raw_data_len, uint8_t* signature, uint16_t* signature_len);
 
 
 //Implemented by libnpnt
 
 /**
  * @brief   Initialise Security interface.
- * @details This method needs to sign the raw data
- *          and signature against the private key generated in-system.
+ * @details This method calls the necessary methods to setup security 
+ *          interface
  *
  * @param[in] npnt_handle        npnt handle
- * @param[in] raw_data           signed raw data to be authenticated
- * @param[in] raw_data_len       signed raw data to be authenticated
- * @param[in] signature          signature of signed raw data
- * @param[in] signature_len      length of signature
- * @param[out] signature_len     updated length of signature
  * 
- * @return           Errcode of signature failure, 0 if signature was generated successfully
- * @retval 0         Successfully Signed
+ * @return           Errcode of failure, 0 if successful
+ * @retval 0         Iface Successfully Setup
  *
  * @iclass security_iface
  */
+int8_t npnt_security_init(npnt_s* npnt_handle);
 
-int npnt_security_init(npnt_s* npnt_handle);
+ /** @} */
