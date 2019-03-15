@@ -4,15 +4,15 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/. 
  */
 
-
- 
+#ifndef CONTROL_IFACE_H
+#define CONTROL_IFACE_H 
  /**
  * @file    inc/control_iface.h
  * @brief   Interface definitions for NPNT control
  * @{
  */
 
-
+#include <defines.h>
 #include <stdint.h>
 
 //User Implemented Methods
@@ -84,9 +84,12 @@ int8_t npnt_breach_state(npnt_s *npnt_handle);
  *          and sets up npnt structure.
  *
  * @param[in] npnt_handle       npnt handle
- * @param[in] raw_permart       permission artefact in raw format as received
+ * @param[in] permart           permission json artefact in base64 format as received
  *                              from server
- * @param[in] permart_length    size of the permission artefact recieved
+ * @param[in] permart_length    size of permission json artefact in base64 format as received
+ *                              from server
+ * @param[in] signature         signature of permart in base64 format
+ * @param[in] signature_length  length of the signature of permart in base64 format 
  * 
  * @return           Error id if faillure, 0 if no breach
  * @retval NPNT_INV_ART   Invalid Artefact
@@ -96,6 +99,9 @@ int8_t npnt_breach_state(npnt_s *npnt_handle);
  *
  * @iclass control_iface
  */
-int8_t npnt_set_current_permart(npnt_s *npnt_handle, uint8_t *raw_permart, uint8_t permart_length);
+int8_t npnt_set_permart(npnt_s *handle, uint8_t *permart, uint16_t permart_length);
+
+int8_t npnt_verify_permart(npnt_s *handle);
 
 /** @} */
+#endif //CONTROL_IFACE_H

@@ -5,6 +5,7 @@
  */
 
 #include <stdint.h>
+#include <defines.h>
 
  /**
  * @file    inc/log_iface.h
@@ -27,7 +28,7 @@
  *
  * @iclass security_iface
  */
-void* npnt_set_security_handle(npnt_s *npnt_handle);
+void* npnt_set_security_handle(npnt_s *handle);
 
 
 /**
@@ -47,7 +48,7 @@ void* npnt_set_security_handle(npnt_s *npnt_handle);
  *
  * @iclass security_iface
  */
-int8_t npnt_check_authenticity(npnt_s *npnt_handle, uint8_t* raw_data, uint16_t raw_data_len, uint8_t* signature, uint16_t signature_len);
+int8_t npnt_check_authenticity(npnt_s *handle, uint8_t* raw_data, uint16_t raw_data_len, uint8_t* signature, uint16_t signature_len);
 
 /**
  * @brief   Signs raw data.
@@ -66,7 +67,7 @@ int8_t npnt_check_authenticity(npnt_s *npnt_handle, uint8_t* raw_data, uint16_t 
  *
  * @iclass security_iface
  */
-int8_t npnt_sign_raw_data(npnt_s *npnt_handle, uint8_t* raw_data, uint16_t raw_data_len, uint8_t* signature, uint16_t* signature_len);
+int8_t npnt_sign_raw_data(npnt_s *handle, uint8_t* raw_data, uint16_t raw_data_len, uint8_t* signature, uint16_t* signature_len);
 
 
 //Implemented by libnpnt
@@ -83,6 +84,6 @@ int8_t npnt_sign_raw_data(npnt_s *npnt_handle, uint8_t* raw_data, uint16_t raw_d
  *
  * @iclass security_iface
  */
-int8_t npnt_security_init(npnt_s* npnt_handle);
+int8_t npnt_security_init(npnt_s* handle);
 
  /** @} */

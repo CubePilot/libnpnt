@@ -11,6 +11,9 @@
  * @{
  */
 
+
+#include <defines.h>
+
 //User Implemented Methods
 
 
