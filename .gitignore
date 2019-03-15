@@ -3,3 +3,4 @@
 *.json
 *.pem
 build/
+.DS_Store
