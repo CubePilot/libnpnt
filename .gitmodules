@@ -1,0 +1,6 @@
+[submodule "mxml"]
+	path = mxml
+	url = https://github.com/michaelrsweet/mxml
+[submodule "jsmn"]
+	path = jsmn
+	url = https://github.com/zserge/jsmn
