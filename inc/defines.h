@@ -34,6 +34,7 @@ typedef struct {
 #define NPNT_UNALLOC_HANDLE         -6
 #define NPNT_PARSE_FAILED           -7
 #define NPNT_INV_DGST               -8
+#define NPNT_INV_SIGN               -9
 
 #endif //#ifndef DEFINES_H
 

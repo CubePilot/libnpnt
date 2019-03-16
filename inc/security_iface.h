@@ -14,23 +14,6 @@
  */
 
 // User Implemented Methods
-
-/**
- * @brief   Sets up Security module and return handler.
- * @details Implementer of this method needs initialise security 
- *          mechanism as specified by the regulation and share the 
- *          handle to the same via this method
- *
- * @param[in] npnt_handle      npnt handle
- * 
- * @return              pointer to security handler.
- * @retval NULL         security handler failed to initialise.
- *
- * @iclass security_iface
- */
-void* npnt_set_security_handle(npnt_s *handle);
-
-
 /**
  * @brief   Checks if the raw data is authentic.
  * @details Implementer of this method needs to check the authenticity

@@ -70,6 +70,8 @@ int8_t npnt_verify_permart(npnt_s *handle)
     // char *test_str;
     int16_t permission_length;
     char digest_value[20];
+    char* signature = NULL;
+    uint16_t signature_len;
     char* base64_digest_value = NULL;
     uint16_t base64_digest_value_len;
     uint16_t curr_ptr = 0, curr_length;
@@ -143,6 +145,23 @@ int8_t npnt_verify_permart(npnt_s *handle)
         }
     }
 
+    //base64_digest_value no longer needed
+    free(base64_digest_value);
+    base64_digest_value = NULL;
+
+    //fetch SignatureValue from xml
+    signature = mxmlGetOpaque(mxmlFindElement(handle->parsed_permart, handle->parsed_permart, "SignatureValue", NULL, NULL, MXML_DESCEND));
+    if (signature == NULL) {
+        ret = NPNT_INV_SIGN;
+        goto fail;
+    }
+    signature_len = strlen(signature);
+
+    //Check authenticity of the artifact
+    if (npnt_check_authenticity(handle, digest_value, 20, signature, signature_len) < 0) {
+        ret = NPNT_INV_AUTH;
+        goto fail;
+    }
 fail:
     if (base64_digest_value) {
         free(base64_digest_value);
