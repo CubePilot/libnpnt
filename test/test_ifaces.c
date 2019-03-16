@@ -253,7 +253,10 @@ int16_t extract_public_key_from_xml_artefact()
         BIO_printf(outbio, "\nFound non-RSA Key\n");
     }
     PEM_write_bio_PUBKEY(outbio, permart_pkey);
-    
+    FILE* pkey_fp = fopen("dgca_pubkey.pem", "w");
+    PEM_write_PUBKEY(pkey_fp, permart_pkey);
+    fclose(pkey_fp);
+
     //Free Everything
     free(buffer);
     mxmlDelete(permart);
