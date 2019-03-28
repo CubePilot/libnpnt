@@ -1,14 +1,21 @@
 TARGET = test_ifaces
-LIBS = -lm -lssl -lcrypto
+LIBS = -lm
 CC = gcc
-CFLAGS = -g -Wall -DRFM_USE_LIBOPENSSL -I../ -I. -I../inc -I/usr/local/opt/openssl/include
-LDFLAGS = -L/usr/local/opt/openssl/lib
+CFLAGS = -g -Wall -I../ -I. -I../inc
+ifeq ($(MAKECMDGOALS),wolfssl)
+CFLAGS += -I/usr/local/Cellar/wolfssl/4.0.0/include/ -I/usr/local/opt/openssl/include -DRFM_USE_WOLFSSL
+LDFLAGS = -L/usr/local/Cellar/wolfssl/4.0.0/lib -lwolfssl -lnetwork -L/usr/local/opt/openssl/lib -lssl -lcrypto
+else
+CFLAGS += -I/usr/local/opt/openssl/include -DRFL_USE_LIBOPENSSL
+LDFLAGS = -L/usr/local/opt/openssl/lib -lssl -lcrypto
+endif
 BUILDDIR = build
 
-.PHONY: default all clean
+.PHONY: default openssl wolfssl clean
 
-default: $(BUILDDIR)/$(TARGET)
-all: default
+openssl: $(BUILDDIR)/$(TARGET)
+wolfssl: $(BUILDDIR)/$(TARGET)
+
 
 SRC := test_ifaces.c \
        ../jsmn/jsmn.c \
