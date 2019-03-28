@@ -1,29 +1,51 @@
-TARGET = libnpnt
-LIBS = -lm
-CC = gcc
-CFLAGS = -g -Wall
+TARGET = libnpnt.a
+CC ?= gcc
+AR ?= ar
+CFLAGS = -g -Wall -I. -Iinc/
+ifeq ($(MAKECMDGOALS),wolfssl)
+CFLAGS += -DRFM_USE_WOLFSSL
+else
+CFLAGS += -DRFL_USE_LIBOPENSSL
+endif
 BUILDDIR = build
 
-.PHONY: default all clean
+.PHONY: default openssl wolfssl clean
 
-default: $(BUILDDIR)/$(TARGET).so
-all: default
+openssl: $(BUILDDIR)/$(TARGET)
+wolfssl: $(BUILDDIR)/$(TARGET)
 
-OBJECTS = $(patsubst src/%.c, build/%.o, $(wildcard src/*.c))
-SRC = $(wildcard src/*.c)
-HEADERS = $(wildcard inc/*.h)
 
+SRC := jsmn/jsmn.c \
+       src/base64.c \
+       src/art_proc.c \
+       mxml/mxml-attr.c \
+       mxml/mxml-entity.c \
+       mxml/mxml-file.c \
+       mxml/mxml-get.c \
+       mxml/mxml-index.c \
+       mxml/mxml-node.c \
+       mxml/mxml-private.c \
+       mxml/mxml-search.c \
+       mxml/mxml-set.c \
+       mxml/mxml-string.c
+
+VPATH  := $(sort $(dir $(SRC)))
+
+HEADERS = $(wildcard ../inc/*.h)
+OBJECTS = $(addprefix $(BUILDDIR)/, $(notdir $(SRC:.c=.o)))
+
+$(OBJECTS): | $(BUILDDIR)
 
 $(BUILDDIR):
 	mkdir -p $(BUILDDIR)
 
-$(OBJECTS): $(SRC) $(HEADERS) $(BUILDDIR)
+$(OBJECTS): $(BUILDDIR)/%.o : %.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 .PRECIOUS: $(BUILDDIR)/$(TARGET) $(OBJECTS)
 
-$(BUILDDIR)/$(TARGET).so: $(OBJECTS) $(BUILDDIR)
-	$(CC) $(OBJECTS) -Wall $(LIBS) -shared -o $@
+$(BUILDDIR)/$(TARGET): $(OBJECTS) $(BUILDDIR)
+	$(AR) rcs $@ $(OBJECTS)
 
 clean:
 	rm -r $(BUILDDIR)
