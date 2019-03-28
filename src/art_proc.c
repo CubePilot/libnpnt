@@ -43,6 +43,7 @@ int8_t npnt_set_permart(npnt_s *handle, uint8_t *permart, uint16_t permart_lengt
     if (!handle) {
         return NPNT_UNALLOC_HANDLE;
     }
+    int16_t ret = 0;
     //Extract XML from base64 encoded permart
     if (handle->raw_permart) {
         return NPNT_ALREADY_SET;
@@ -59,7 +60,35 @@ int8_t npnt_set_permart(npnt_s *handle, uint8_t *permart, uint16_t permart_lengt
         return NPNT_PARSE_FAILED;
     }
 
-    return npnt_verify_permart(handle);
+    //Verify Artifact against Sender's Public Key
+    ret = npnt_verify_permart(handle);
+    if (ret < 0) {
+        return ret;
+    }
+
+    //Collect Fence points from verified artefact
+    ret = npnt_alloc_and_get_fence_points(handle, handle->fence.vertlat, handle->fence.vertlon);
+    if (ret <= 0) {
+        handle->fence.nverts = 0;
+        return NPNT_BAD_FENCE;
+    }
+    handle->fence.nverts = ret;
+    ret = 0;
+
+    //Get Max Altitude
+    ret = npnt_get_max_altitude(handle, &handle->fence.maxAltitude);
+    if (ret < 0) {
+        return NPNT_INV_BAD_ALT;
+    }
+
+    //Set Flight Params from artefact
+    ret = npnt_populate_flight_params(handle);
+    if (ret < 0) {
+        handle->fence.nverts = 0;
+        return NPNT_INV_FPARAMS;
+    }
+    ret = 0;
+    return ret;
 }
 
 //Verify the data contained in parsed XML
@@ -168,3 +197,166 @@ fail:
     }
     return ret;
 }
+
+int8_t npnt_alloc_and_get_fence_points(npnt_s* handle, float* vertlat, float* vertlon)
+{
+    //Calculate number of vertices
+    mxml_node_t *first_coordinate, *current_coordinate;
+    uint16_t nverts = 0;
+    char* lat_str;
+    char* lon_str;
+    first_coordinate = mxmlGetFirstChild(mxmlFindElement(handle->parsed_permart, handle->parsed_permart, "Coordinates", NULL, NULL, MXML_DESCEND));
+    current_coordinate = first_coordinate;
+    while (current_coordinate) {
+        if (mxmlGetElement(current_coordinate) == NULL) {
+            current_coordinate = mxmlGetNextSibling(current_coordinate);
+            continue;
+        }
+        if (strcmp(mxmlGetElement(current_coordinate), "Coordinate") != 0) {
+            current_coordinate = mxmlGetNextSibling(current_coordinate);
+            continue;
+        }
+        current_coordinate = mxmlGetNextSibling(current_coordinate);
+        nverts++;
+    }
+
+    //Allocate vertices
+    vertlat = (float*)malloc(nverts*sizeof(float));
+    vertlon = (float*)malloc(nverts*sizeof(float));
+
+    if (!vertlat || !vertlon) {
+        return -1;
+    }
+    //read coordinates
+    nverts = 0;
+    current_coordinate = first_coordinate;
+    while(current_coordinate) {
+        if (mxmlGetElement(current_coordinate) == NULL) {
+            current_coordinate = mxmlGetNextSibling(current_coordinate);
+            continue;
+        }
+        if (strcmp(mxmlGetElement(current_coordinate), "Coordinate") != 0) {
+            current_coordinate = mxmlGetNextSibling(current_coordinate);
+            continue;
+        }
+        lat_str = mxmlElementGetAttr(current_coordinate, "latitude");
+        if (lat_str) {
+            vertlat[nverts] = atof(lat_str);
+        } else {
+            goto fail;
+        }
+        lon_str = mxmlElementGetAttr(current_coordinate, "longitude");
+        if (lon_str) {
+            vertlon[nverts] = atof(lon_str);
+        } else {
+            goto fail;
+        }
+        // printf("\n%s %.20f %.20f\n", mxmlGetElement(current_coordinate), vertlat[nverts], vertlon[nverts]);
+        current_coordinate = mxmlGetNextSibling(current_coordinate);
+        nverts++;
+    }
+    return nverts;
+fail:
+    free(vertlat);
+    free(vertlon);
+    return -1;
+}
+
+int8_t npnt_get_max_altitude(npnt_s* handle, float* altitude)
+{
+    mxml_node_t* flightparams;
+    char* alt_str;
+    if (!altitude) {
+        return -1;
+    }
+    flightparams = mxmlFindElement(handle->parsed_permart, handle->parsed_permart, "FlightParameters", NULL, NULL, MXML_DESCEND);
+    if (flightparams == NULL) {
+        return -1;
+    }
+    alt_str = mxmlElementGetAttr(flightparams, "maxAltitude");
+    if (alt_str) {
+        *altitude = atof(alt_str);
+        // printf("Altitude: %f\n", *altitude);
+    } else {
+        return -1;
+    }
+    return 0;
+}
+
+int8_t npnt_ist_date_time_to_unix_time(char* dt_string, struct tm* date_time)
+{
+    char data[5] = {};
+    if (strlen(dt_string) != 19) {
+        return -1;
+    }
+    if (!date_time) {
+        return -1;
+    }
+    memset(date_time, 0, sizeof(struct tm));
+
+    //read year
+    memcpy(data, dt_string, 4);
+    data[4] = '\0';
+    date_time->tm_year = atoi(data) - 1900;
+    //read month
+    memcpy(data, &dt_string[5], 2);
+    data[2] = '\0';
+    date_time->tm_mon = atoi(data);
+    //read day
+    memcpy(data, &dt_string[8], 2);
+    data[2] = '\0';
+    date_time->tm_mday = atoi(data);
+    //read hour
+    memcpy(data, &dt_string[11], 2);
+    data[2] = '\0';
+    date_time->tm_hour = atoi(data) - 5; //also apply IST to UTC offset
+    //read minute
+    memcpy(data, &dt_string[14], 2) - 30; //also apply IST to UTC offset
+    data[2] = '\0';
+    date_time->tm_min = atoi(data);
+    //read second
+    memcpy(data, &dt_string[17], 2);
+    data[2] = '\0';
+    date_time->tm_sec = atoi(data);
+
+    return 0;
+    // time_t tim = mktime(date_time);
+    // printf("\nUnixTime: %s\n", ctime(&tim));
+}
+
+int8_t npnt_populate_flight_params(npnt_s* handle)
+{
+    mxml_node_t *ua_detail, *flight_params;
+    ua_detail = mxmlFindElement(handle->parsed_permart, handle->parsed_permart, "UADetails", NULL, NULL, MXML_DESCEND);
+    if (!ua_detail) {
+        return -1;
+    }
+    flight_params = mxmlFindElement(handle->parsed_permart, handle->parsed_permart, "FlightParameters", NULL, NULL, MXML_DESCEND);
+    if (!flight_params) {
+        return -1;
+    }
+    handle->params.uinNo = mxmlElementGetAttr(ua_detail, "uinNo");
+    if (!handle->params.uinNo) {
+        return -1;
+    }
+    handle->params.adcNumber = mxmlElementGetAttr(flight_params, "adcNumber");
+    if (!handle->params.adcNumber) {
+        return -1;
+    }
+
+    handle->params.ficNumber = mxmlElementGetAttr(flight_params, "ficNumber");
+    if (!handle->params.ficNumber) {
+        return -1;
+    }
+    if (npnt_ist_date_time_to_unix_time(mxmlElementGetAttr(flight_params, "flightEndTime"), &handle->params.flightEndTime) < 0) {
+        return -1;
+    }
+    if (npnt_ist_date_time_to_unix_time(mxmlElementGetAttr(flight_params, "flightStartTime"), &handle->params.flightStartTime) < 0) {
+        return -1;
+    }
+    return 0;
+fail:
+    return NPNT_INV_FPARAMS;
+}
+
+

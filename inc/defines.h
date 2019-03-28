@@ -18,6 +18,7 @@
 #include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 #include <mxml/mxml.h>
 
 typedef struct {
@@ -25,6 +26,19 @@ typedef struct {
     uint16_t raw_permart_len;
     void*   security_handle;
     mxml_node_t *parsed_permart;
+    struct {
+        float* vertlat;     //degrees
+        float* vertlon;     //degrees
+        float maxAltitude; //meters
+        uint8_t nverts;
+    } fence;
+    struct {
+        char* uinNo;
+        char* adcNumber;
+        char* ficNumber;
+        struct tm flightStartTime;
+        struct tm flightEndTime;
+    } params;
 } npnt_s;
 
 #define NPNT_INV_ART                -1
@@ -35,6 +49,9 @@ typedef struct {
 #define NPNT_PARSE_FAILED           -7
 #define NPNT_INV_DGST               -8
 #define NPNT_INV_SIGN               -9
+#define NPNT_BAD_FENCE              -10
+#define NPNT_INV_FPARAMS            -11
+#define NPNT_INV_BAD_ALT            -12
 
 #endif //#ifndef DEFINES_H
 

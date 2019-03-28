@@ -1,7 +1,8 @@
 TARGET = test_ifaces
 LIBS = -lm -lssl -lcrypto
 CC = gcc
-CFLAGS = -g -Wall -I../ -I. -I../inc
+CFLAGS = -g -Wall -DRFM_USE_LIBOPENSSL -I../ -I. -I../inc -I/usr/local/opt/openssl/include
+LDFLAGS = -L/usr/local/opt/openssl/lib
 BUILDDIR = build
 
 .PHONY: default all clean
@@ -10,10 +11,10 @@ default: $(BUILDDIR)/$(TARGET)
 all: default
 
 SRC := test_ifaces.c \
-       npnt_helpers.c \
-	   ../jsmn/jsmn.c \
-	   ../src/base64.c \
-          ../src/art_proc.c \
+       ../jsmn/jsmn.c \
+       ../src/npnt_helpers.c \
+       ../src/base64.c \
+       ../src/art_proc.c \
        ../mxml/mxml-attr.c \
        ../mxml/mxml-entity.c \
        ../mxml/mxml-file.c \
@@ -36,12 +37,12 @@ $(BUILDDIR):
 	mkdir -p $(BUILDDIR)
 
 $(OBJECTS): $(BUILDDIR)/%.o : %.c
-	$(CC) $(CFLAGS) -g -c $< -o $@
+	$(CC) $(CFLAGS) -c $< -o $@
 
 .PRECIOUS: $(BUILDDIR)/$(TARGET) $(OBJECTS)
 
 $(BUILDDIR)/$(TARGET): $(OBJECTS) $(BUILDDIR)
-	$(CC) $(OBJECTS) -g -Wall $(LIBS) -o $@
+	$(CC) $(OBJECTS) -g -Wall $(LDFLAGS) $(LIBS) -o $@
 
 clean:
 	rm -r $(BUILDDIR)
