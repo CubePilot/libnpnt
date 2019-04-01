@@ -6,18 +6,6 @@
 
 #include <npnt_internal.h>
 
-int8_t npnt_init_handle(npnt_s *handle)
-{
-    if (!handle) {
-        return NPNT_UNALLOC_HANDLE;
-    }
-    handle->parsed_permart = NULL;
-    handle->raw_permart = NULL;
-    handle->raw_permart_len = 0;
-    handle->security_handle = NULL;
-    return 0;
-}
-
 /**
  * @brief   Sets Current Permission Artifact.
  * @details This method consumes peremission artefact in raw format

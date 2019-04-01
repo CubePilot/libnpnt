@@ -101,6 +101,8 @@ int8_t npnt_breach_state(npnt_s *npnt_handle);
  */
 int8_t npnt_set_permart(npnt_s *handle, uint8_t *permart, uint16_t permart_length);
 
+int8_t npnt_init_handle(npnt_s *handle);
+
 int8_t npnt_verify_permart(npnt_s *handle);
 
 int8_t npnt_alloc_and_get_fence_points(npnt_s* handle, float* vertx, float* verty);
@@ -108,5 +110,8 @@ int8_t npnt_alloc_and_get_fence_points(npnt_s* handle, float* vertx, float* vert
 int8_t npnt_get_max_altitude(npnt_s* handle, float* altitude);
 
 int8_t npnt_populate_flight_params(npnt_s* handle);
+
+bool npnt_pnpoly(int nvert, float *vertx, float *verty, float testx, float testy);
+
 /** @} */
 #endif //CONTROL_IFACE_H
