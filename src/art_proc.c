@@ -83,17 +83,82 @@ int8_t npnt_set_permart(npnt_s *handle, uint8_t *permart, uint16_t permart_lengt
 int8_t npnt_verify_permart(npnt_s *handle)
 {
     char* raw_perm_without_sign;
+    char* signed_info;
     char* rcvd_digest_value;
     // char *test_str;
-    int16_t permission_length;
+    int16_t permission_length, signedinfo_length;
     char digest_value[20];
     char* signature = NULL;
-    uint16_t signature_len;
+    char* raw_signature = NULL;
+    uint16_t signature_len, raw_signature_len;
     char* base64_digest_value = NULL;
     uint16_t base64_digest_value_len;
     uint16_t curr_ptr = 0, curr_length;
     char last_empty_element[20];
     int8_t ret = 0;
+    
+    reset_sha1();
+    
+    //Digest Signed Info
+    update_sha1("<SignedInfo xmlns=\"http://www.w3.org/2000/09/xmldsig#\">", 
+                strlen("<SignedInfo xmlns=\"http://www.w3.org/2000/09/xmldsig#\">"));
+    signed_info = strstr(handle->raw_permart, "<SignedInfo>") + strlen("<SignedInfo>");
+    if (signed_info == NULL) {
+        ret = NPNT_INV_ART;
+        goto fail;
+    }
+    signedinfo_length = strstr(handle->raw_permart, "<SignatureValue") - signed_info;
+    if (signedinfo_length < 0) {
+        ret = NPNT_INV_ART;
+        goto fail;
+    }
+    while (curr_ptr < signedinfo_length) {
+        curr_length = 1;
+        if (signed_info[curr_ptr] == '<') {
+            while((curr_ptr + curr_length) < signedinfo_length) {
+                if (signed_info[curr_ptr + curr_length] == ' ') {
+                    last_empty_element[curr_length - 1] = '\0';
+                    break;
+                } else if (signed_info[curr_ptr + curr_length] == '>') {
+                    last_empty_element[0] = '\0';
+                    break;
+                }
+                last_empty_element[curr_length - 1] = signed_info[curr_ptr + curr_length];
+                curr_length++;
+            }
+        }
+
+        if (strlen(last_empty_element) != 0) {
+            if (signed_info[curr_ptr] == '/') {
+                if (signed_info[curr_ptr + 1] == '>') {
+                    update_sha1("></", 3);
+                    update_sha1(last_empty_element, strlen(last_empty_element));
+                    last_empty_element[0] = '\0';
+                    curr_ptr += curr_length;
+                    continue;
+                }
+            }
+        }
+
+        update_sha1(&signed_info[curr_ptr], curr_length);
+        curr_ptr += curr_length;
+    }
+    final_sha1(digest_value);
+
+    //fetch SignatureValue from xml
+    signature = mxmlGetOpaque(mxmlFindElement(handle->parsed_permart, handle->parsed_permart, "SignatureValue", NULL, NULL, MXML_DESCEND));
+    if (signature == NULL) {
+        ret = NPNT_INV_SIGN;
+        goto fail;
+    }
+    signature_len = strlen(signature);
+    raw_signature = base64_decode(signature, signature_len, &raw_signature_len);
+    //Check authenticity of the artifact
+    if (npnt_check_authenticity(handle, digest_value, 20, raw_signature, raw_signature_len) <= 0) {
+        ret = NPNT_INV_AUTH;
+        goto fail;
+    }
+
     //Digest Canonicalised Permission Artifact
     raw_perm_without_sign = strstr(handle->raw_permart, "<UAPermission>");
     if (raw_perm_without_sign == NULL) {
@@ -111,7 +176,8 @@ int8_t npnt_verify_permart(npnt_s *handle)
     // printf("\n RAW PERMISSION: \n%s", test_str);
 
     reset_sha1();
-
+    curr_ptr = 0;
+    curr_length = 0;
     //Canonicalise Permission Artefact by converting Empty elements to start-end tag pairs
     while (curr_ptr < permission_length) {
         curr_length = 1;
@@ -165,20 +231,6 @@ int8_t npnt_verify_permart(npnt_s *handle)
     //base64_digest_value no longer needed
     free(base64_digest_value);
     base64_digest_value = NULL;
-
-    //fetch SignatureValue from xml
-    signature = mxmlGetOpaque(mxmlFindElement(handle->parsed_permart, handle->parsed_permart, "SignatureValue", NULL, NULL, MXML_DESCEND));
-    if (signature == NULL) {
-        ret = NPNT_INV_SIGN;
-        goto fail;
-    }
-    signature_len = strlen(signature);
-
-    //Check authenticity of the artifact
-    if (npnt_check_authenticity(handle, digest_value, 20, signature, signature_len) < 0) {
-        ret = NPNT_INV_AUTH;
-        goto fail;
-    }
 fail:
     if (base64_digest_value) {
         free(base64_digest_value);

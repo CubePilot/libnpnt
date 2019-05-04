@@ -124,6 +124,10 @@ int8_t npnt_check_authenticity(npnt_s *handle, uint8_t* raw_data, uint16_t raw_d
         ret = -1;
         goto fail;
     }
+    if (EVP_PKEY_CTX_set_signature_md(dgca_pkey_ctx, EVP_sha1()) <= 0) {
+        ret = -1;
+        goto fail;
+    }
 
     /* Perform operation */
     ret = EVP_PKEY_verify(dgca_pkey_ctx, signature, signature_len, raw_data, raw_data_len);
