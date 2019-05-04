@@ -14,7 +14,7 @@
 
 #include <defines.h>
 #include <stdint.h>
-
+#include <stdbool.h>
 //User Implemented Methods
 /**
  * @brief   Returns Current GPS Time in 64bit UTC format.
