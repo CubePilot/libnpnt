@@ -16,10 +16,16 @@
 #include <security_iface.h>
 #include <control_iface.h>
 
-
+#ifdef __cplusplus
+extern "C"
+{
+#endif
 //Common helper headers
 void reset_sha1();
 void update_sha1(const char* data, uint16_t data_len);
 void final_sha1(char* hash);
 
+#ifdef __cplusplus
+} // extern "C"
+#endif
 #endif //NPNT_H

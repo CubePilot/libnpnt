@@ -14,6 +14,12 @@
 #include <security_iface.h>
 #include <control_iface.h>
 
+
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
 /**
  * base64_encode - Base64 encode
  * @src: Data to be encoded
@@ -43,4 +49,7 @@ uint8_t* base64_decode(const uint8_t *src, uint16_t len, uint16_t *out_len);
 int8_t npnt_ist_date_time_to_unix_time(const char* dt_string, struct tm* date_time);
 char* npnt_get_attr(mxml_node_t *node, const char* attr);
 
+#ifdef __cplusplus
+} // extern "C"
+#endif
  /** @} */

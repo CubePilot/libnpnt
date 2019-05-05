@@ -21,6 +21,12 @@
 #include <time.h>
 #include <mxml/mxml.h>
 
+
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
 typedef struct {
     char *raw_permart;
     uint16_t raw_permart_len;
@@ -52,6 +58,10 @@ typedef struct {
 #define NPNT_BAD_FENCE              -10
 #define NPNT_INV_FPARAMS            -11
 #define NPNT_INV_BAD_ALT            -12
+
+#ifdef __cplusplus
+} // extern "C"
+#endif
 
 #endif //#ifndef DEFINES_H
 

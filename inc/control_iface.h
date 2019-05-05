@@ -15,6 +15,13 @@
 #include <defines.h>
 #include <stdint.h>
 #include <stdbool.h>
+
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
+
 //User Implemented Methods
 /**
  * @brief   Returns Current GPS Time in 64bit UTC format.
@@ -116,4 +123,8 @@ int8_t npnt_populate_flight_params(npnt_s* handle);
 bool npnt_pnpoly(int nvert, float *vertx, float *verty, float testx, float testy);
 
 /** @} */
+#ifdef __cplusplus
+} // extern "C"
+#endif
+
 #endif //CONTROL_IFACE_H

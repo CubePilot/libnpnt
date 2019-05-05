@@ -7,6 +7,10 @@
 #include <stdint.h>
 #include <defines.h>
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
  /**
  * @file    inc/log_iface.h
  * @brief   Interface definitions for NPNT Breach logging
@@ -69,4 +73,7 @@ int8_t npnt_sign_raw_data(npnt_s *handle, uint8_t* raw_data, uint16_t raw_data_l
  */
 int8_t npnt_security_init(npnt_s* handle);
 
+#ifdef __cplusplus
+} // extern "C"
+#endif
  /** @} */
