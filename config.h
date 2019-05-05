@@ -27,6 +27,8 @@
 #define MXML_VERSION "Mini-XML v3.0"
 
 
+#define MXML_LIGHTWEIGHT
+ 
 /*
  * Inline function support...
  */
