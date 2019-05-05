@@ -18,6 +18,7 @@ wolfssl: $(BUILDDIR)/$(TARGET)
 SRC := jsmn/jsmn.c \
        src/base64.c \
        src/art_proc.c \
+       src/control.c \
        mxml/mxml-attr.c \
        mxml/mxml-entity.c \
        mxml/mxml-file.c \
