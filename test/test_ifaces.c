@@ -297,7 +297,7 @@ int16_t load_artifact()
 
     //set artifact
     npnt_init_handle(&npnt_handle);
-    ret = npnt_set_permart(&npnt_handle, base64_permart, outlen);
+    ret = npnt_set_permart(&npnt_handle, base64_permart, outlen, true);
     if (ret != 0) {
         BIO_printf(outbio, "Failed to set artifact %d\n", ret);
     } else {

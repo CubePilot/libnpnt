@@ -91,7 +91,7 @@ int8_t npnt_set_permart(npnt_s *handle, uint8_t *permart, uint16_t permart_lengt
 int8_t npnt_verify_permart(npnt_s *handle)
 {
     char* raw_perm_without_sign;
-    uint8_t* signed_info;
+    char* signed_info;
     const uint8_t* rcvd_digest_value;
     // char *test_str;
     int16_t permission_length, signedinfo_length;

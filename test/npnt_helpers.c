@@ -99,7 +99,7 @@ int8_t npnt_check_authenticity(npnt_s *handle, uint8_t* raw_data, uint16_t raw_d
 #else
 static EVP_PKEY *dgca_pkey = NULL;
 static EVP_PKEY_CTX *dgca_pkey_ctx;
-int8_t npnt_check_authenticity(npnt_s *handle, uint8_t* raw_data, uint16_t raw_data_len, uint8_t* signature, uint16_t signature_len)
+int8_t npnt_check_authenticity(npnt_s *handle, uint8_t* raw_data, uint16_t raw_data_len, const uint8_t* signature, uint16_t signature_len)
 {
     if (!handle || !raw_data || !signature) {
         return -1;
