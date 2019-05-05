@@ -99,9 +99,11 @@ int8_t npnt_breach_state(npnt_s *npnt_handle);
  *
  * @iclass control_iface
  */
-int8_t npnt_set_permart(npnt_s *handle, uint8_t *permart, uint16_t permart_length);
+int8_t npnt_set_permart(npnt_s *handle, uint8_t *permart, uint16_t permart_length, uint8_t base64_encoded);
 
 int8_t npnt_init_handle(npnt_s *handle);
+
+int8_t npnt_reset_handle(npnt_s *handle);
 
 int8_t npnt_verify_permart(npnt_s *handle);
 

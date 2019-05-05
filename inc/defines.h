@@ -22,7 +22,7 @@
 #include <mxml/mxml.h>
 
 typedef struct {
-    uint8_t *raw_permart;
+    char *raw_permart;
     uint16_t raw_permart_len;
     void*   security_handle;
     mxml_node_t *parsed_permart;

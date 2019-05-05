@@ -40,6 +40,7 @@ uint8_t* base64_encode(const uint8_t *src, uint16_t len, uint16_t *out_len);
  */
 uint8_t* base64_decode(const uint8_t *src, uint16_t len, uint16_t *out_len);
 
-int8_t npnt_ist_date_time_to_unix_time(char* dt_string, struct tm* date_time);
+int8_t npnt_ist_date_time_to_unix_time(const char* dt_string, struct tm* date_time);
+char* npnt_get_attr(mxml_node_t *node, const char* attr);
 
  /** @} */

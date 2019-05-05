@@ -26,7 +26,7 @@
  *         NPNT_ALREADY_SET artefact already set, free previous artefact first
  * @iclass control_iface
  */
-int8_t npnt_set_permart(npnt_s *handle, uint8_t *permart, uint16_t permart_length)
+int8_t npnt_set_permart(npnt_s *handle, uint8_t *permart, uint16_t permart_length, uint8_t base64_encoded)
 {
     if (!handle) {
         return NPNT_UNALLOC_HANDLE;
@@ -37,9 +37,17 @@ int8_t npnt_set_permart(npnt_s *handle, uint8_t *permart, uint16_t permart_lengt
         return NPNT_ALREADY_SET;
     }
 
-    handle->raw_permart = base64_decode(permart, permart_length, &handle->raw_permart_len);
-    if (!handle->raw_permart) {
-        return NPNT_PARSE_FAILED;
+    if (base64_encoded) {
+        handle->raw_permart = (char*)base64_decode(permart, permart_length, &handle->raw_permart_len);
+        if (!handle->raw_permart) {
+            return NPNT_PARSE_FAILED;
+        }
+    } else {
+        handle->raw_permart = (char*)malloc(permart_length);
+        if (!handle->raw_permart) {
+            return NPNT_PARSE_FAILED;
+        }
+        memcpy(handle->raw_permart, permart, permart_length);
     }
 
     //parse XML permart
@@ -83,15 +91,15 @@ int8_t npnt_set_permart(npnt_s *handle, uint8_t *permart, uint16_t permart_lengt
 int8_t npnt_verify_permart(npnt_s *handle)
 {
     char* raw_perm_without_sign;
-    char* signed_info;
-    char* rcvd_digest_value;
+    uint8_t* signed_info;
+    const uint8_t* rcvd_digest_value;
     // char *test_str;
     int16_t permission_length, signedinfo_length;
     char digest_value[20];
-    char* signature = NULL;
-    char* raw_signature = NULL;
+    const uint8_t* signature = NULL;
+    uint8_t* raw_signature = NULL;
     uint16_t signature_len, raw_signature_len;
-    char* base64_digest_value = NULL;
+    uint8_t* base64_digest_value = NULL;
     uint16_t base64_digest_value_len;
     uint16_t curr_ptr = 0, curr_length;
     char last_empty_element[20];
@@ -146,7 +154,7 @@ int8_t npnt_verify_permart(npnt_s *handle)
     final_sha1(digest_value);
 
     //fetch SignatureValue from xml
-    signature = mxmlGetOpaque(mxmlFindElement(handle->parsed_permart, handle->parsed_permart, "SignatureValue", NULL, NULL, MXML_DESCEND));
+    signature = (const uint8_t*)mxmlGetOpaque(mxmlFindElement(handle->parsed_permart, handle->parsed_permart, "SignatureValue", NULL, NULL, MXML_DESCEND));
     if (signature == NULL) {
         ret = NPNT_INV_SIGN;
         goto fail;
@@ -220,7 +228,7 @@ int8_t npnt_verify_permart(npnt_s *handle)
     // printf("\nDigest Value: \n%s\n", mxmlGetOpaque(mxmlFindElement(handle->parsed_permart, handle->parsed_permart, "DigestValue", NULL, NULL, MXML_DESCEND)));
     
     //Check Digestion
-    rcvd_digest_value = mxmlGetOpaque(mxmlFindElement(handle->parsed_permart, handle->parsed_permart, "DigestValue", NULL, NULL, MXML_DESCEND));
+    rcvd_digest_value = (const uint8_t*)mxmlGetOpaque(mxmlFindElement(handle->parsed_permart, handle->parsed_permart, "DigestValue", NULL, NULL, MXML_DESCEND));
     for (uint16_t i = 0; i < base64_digest_value_len - 1; i++) {
         if (base64_digest_value[i] != rcvd_digest_value[i]) {
             ret = NPNT_INV_DGST;
@@ -243,8 +251,8 @@ int8_t npnt_alloc_and_get_fence_points(npnt_s* handle, float* vertlat, float* ve
     //Calculate number of vertices
     mxml_node_t *first_coordinate, *current_coordinate;
     uint16_t nverts = 0;
-    char* lat_str;
-    char* lon_str;
+    const char* lat_str;
+    const char* lon_str;
     first_coordinate = mxmlGetFirstChild(mxmlFindElement(handle->parsed_permart, handle->parsed_permart, "Coordinates", NULL, NULL, MXML_DESCEND));
     current_coordinate = first_coordinate;
     while (current_coordinate) {
@@ -305,7 +313,7 @@ fail:
 int8_t npnt_get_max_altitude(npnt_s* handle, float* altitude)
 {
     mxml_node_t* flightparams;
-    char* alt_str;
+    const char* alt_str;
     if (!altitude) {
         return -1;
     }
@@ -323,7 +331,7 @@ int8_t npnt_get_max_altitude(npnt_s* handle, float* altitude)
     return 0;
 }
 
-int8_t npnt_ist_date_time_to_unix_time(char* dt_string, struct tm* date_time)
+int8_t npnt_ist_date_time_to_unix_time(const char* dt_string, struct tm* date_time)
 {
     char data[5] = {};
     if (strlen(dt_string) != 19) {
@@ -351,9 +359,9 @@ int8_t npnt_ist_date_time_to_unix_time(char* dt_string, struct tm* date_time)
     data[2] = '\0';
     date_time->tm_hour = atoi(data) - 5; //also apply IST to UTC offset
     //read minute
-    memcpy(data, &dt_string[14], 2) - 30; //also apply IST to UTC offset
+    memcpy(data, &dt_string[14], 2); //also apply IST to UTC offset
     data[2] = '\0';
-    date_time->tm_min = atoi(data);
+    date_time->tm_min = atoi(data) - 30;
     //read second
     memcpy(data, &dt_string[17], 2);
     data[2] = '\0';
@@ -364,39 +372,55 @@ int8_t npnt_ist_date_time_to_unix_time(char* dt_string, struct tm* date_time)
     // printf("\nUnixTime: %s\n", ctime(&tim));
 }
 
+char* npnt_get_attr(mxml_node_t *node, const char* attr)
+{
+    const char* tmp = NULL;
+    char* ret = NULL;
+    tmp = mxmlElementGetAttr(node, attr);
+    if (!tmp) {
+        return NULL;
+    }
+    ret = (char*)malloc(strlen(tmp) + 1);
+    if (!ret) {
+        return NULL;
+    }
+    strcpy(ret, tmp);
+    return ret;
+}
+
 int8_t npnt_populate_flight_params(npnt_s* handle)
 {
     mxml_node_t *ua_detail, *flight_params;
     ua_detail = mxmlFindElement(handle->parsed_permart, handle->parsed_permart, "UADetails", NULL, NULL, MXML_DESCEND);
     if (!ua_detail) {
-        return -1;
+        return NPNT_INV_FPARAMS;
     }
     flight_params = mxmlFindElement(handle->parsed_permart, handle->parsed_permart, "FlightParameters", NULL, NULL, MXML_DESCEND);
     if (!flight_params) {
-        return -1;
-    }
-    handle->params.uinNo = mxmlElementGetAttr(ua_detail, "uinNo");
-    if (!handle->params.uinNo) {
-        return -1;
-    }
-    handle->params.adcNumber = mxmlElementGetAttr(flight_params, "adcNumber");
-    if (!handle->params.adcNumber) {
-        return -1;
+        return NPNT_INV_FPARAMS;
     }
 
-    handle->params.ficNumber = mxmlElementGetAttr(flight_params, "ficNumber");
+    handle->params.uinNo = npnt_get_attr(ua_detail, "uinNo");
+    if (!handle->params.uinNo) {
+        return NPNT_INV_FPARAMS;
+    }
+
+    handle->params.adcNumber = npnt_get_attr(flight_params, "adcNumber");
+    if (!handle->params.adcNumber) {
+        return NPNT_INV_FPARAMS;
+    }
+
+    handle->params.ficNumber = npnt_get_attr(flight_params, "ficNumber");
     if (!handle->params.ficNumber) {
-        return -1;
+        return NPNT_INV_FPARAMS;
     }
     if (npnt_ist_date_time_to_unix_time(mxmlElementGetAttr(flight_params, "flightEndTime"), &handle->params.flightEndTime) < 0) {
-        return -1;
+        return NPNT_INV_FPARAMS;
     }
     if (npnt_ist_date_time_to_unix_time(mxmlElementGetAttr(flight_params, "flightStartTime"), &handle->params.flightStartTime) < 0) {
-        return -1;
+        return NPNT_INV_FPARAMS;
     }
     return 0;
-fail:
-    return NPNT_INV_FPARAMS;
 }
 
 
