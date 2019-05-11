@@ -35,7 +35,7 @@ extern "C"
  *
  * @iclass security_iface
  */
-int8_t npnt_check_authenticity(npnt_s *handle, uint8_t* raw_data, uint16_t raw_data_len, const uint8_t* signature, uint16_t signature_len);
+int8_t npnt_check_authenticity(npnt_s *handle, uint8_t* hashed_data, uint16_t hashed_data_len, const uint8_t* signature, uint16_t signature_len);
 
 /**
  * @brief   Signs raw data.

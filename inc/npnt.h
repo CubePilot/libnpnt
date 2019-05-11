@@ -24,7 +24,6 @@ extern "C"
 void reset_sha1();
 void update_sha1(const char* data, uint16_t data_len);
 void final_sha1(char* hash);
-int8_t set_rsa_pubkey(uint8_t* der_key_str, uint16_t der_key_str_len);
 
 #ifdef __cplusplus
 } // extern "C"
