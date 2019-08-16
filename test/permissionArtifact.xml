@@ -1,46 +1,17 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?><UAPermission>
-    <Permission>
-    <Owner operatorID="82ab06908761488e91bcbf581dbf96b0">
-        <Pilot id="9646771ef9e148228a6d56f305df6489" validTo="NA"/>
-    </Owner>
-    <FlightDetails>
-        <UADetails uinNo="5bfd56f14cedfd0006411b7b"/>
-        <FlightPurpose shortDesc="test"/>
-        <PayloadDetails payLoadWeightInKg="5" payloadDetails="test"/>
-        <FlightParameters adcNumber="RCA0001" ficNumber="00000RO" flightEndTime="2019-02-22T11:00:27" flightStartTime="2019-02-22T10:45:00" maxAltitude="19" recurrenceTimeExpression="" recurrenceTimeExpressionType="CRON_QUARTZ" recurringTimeDurationInMinutes="">
-            <Coordinates>
-                <Coordinate latitude="18.808697246094454" longitude="78.44263916091268"/><Coordinate latitude="18.808645980751677" longitude="78.44512592823935"/><Coordinate latitude="18.80793125065628" longitude="78.44423285829446"/><Coordinate latitude="18.808697246094454" longitude="78.44263916091268"/>
-            </Coordinates>
-        </FlightParameters>
-    </FlightDetails>
-    </Permission>
-<Signature xmlns="http://www.w3.org/2000/09/xmldsig#"><SignedInfo><CanonicalizationMethod Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315"/><SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1"/><Reference URI=""><Transforms><Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/></Transforms><DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/><DigestValue>FiFxr9WVHYT2gdR3+5af7/g0+Ww=</DigestValue></Reference></SignedInfo><SignatureValue>ZDSIZ+b9cwwZmMLy1FXhY9SLh9cDMbrWoExAEkOXjp0VQ1H/k5Xw63zOqXcRhE9LFggU1yj1RSgI
-GqCquNYHCe8rlRigp6fjv5vCSy7/1X+mAvptBe3qNwSzTApcpO1bg+6W1RFHf3e23zVmkjeh6XDF
-f+oHrc9eIr3zu4C35317sCzE9r9iuLEGQgieoUCszIL9IwDA7roExicQ9ZRyiZXxU4BN8e6hJCbo
-pcUHSi6g2Gfl3PoLBUzHSqPzFrgq4lx3d0oVE4DJ3ki1k2tLr7W8jD5FmlF7mKksjobfzxvL4zxw
-8ItwZ2vhxCfANzNLDFRGnHIVFAb/YL1NXEgXow==</SignatureValue><KeyInfo><X509Data><X509SubjectName>CN=digitalsky-uat.centralindia.cloudapp.azure.com</X509SubjectName><X509Certificate>MIIFkzCCBHugAwIBAgISAyI7M91MQCCbbWlllg6lVcCfMA0GCSqGSIb3DQEBCwUAMEoxCzAJBgNV
-BAYTAlVTMRYwFAYDVQQKEw1MZXQncyBFbmNyeXB0MSMwIQYDVQQDExpMZXQncyBFbmNyeXB0IEF1
-dGhvcml0eSBYMzAeFw0xOTAyMTgwOTIzMTdaFw0xOTA1MTkwOTIzMTdaMDkxNzA1BgNVBAMTLmRp
-Z2l0YWxza3ktdWF0LmNlbnRyYWxpbmRpYS5jbG91ZGFwcC5henVyZS5jb20wggEiMA0GCSqGSIb3
-DQEBAQUAA4IBDwAwggEKAoIBAQDSWxgN+lSBwoF+LPENkAfMnYmJKudd8OMld0kPduj1DllAF0f6
-ZhocUVbt6aTc91ENXaWmkZTik2+nl1mj6f4OQXCR8h6gFe/EhLTZ6WxLeJT4K1oYH+v88Rz2tL9J
-TmY/9PalA/nsDjAb8aOvRBeD/0N9BdbLUmukLmMH9I9Q4HURBMH5rmNExTI7olZ/mhi9E0fNsVb0
-ONhJekCYBZY0VRdJ2fDmB8d1jvVSD++ARlnXlYyrDxcK7uQ3P+O5HdZ5yjQYvMvuRMQsEhYnoWXJ
-kG3tql2bHz7TLzwPdP5/4FoKMJ6wHCDCrpy5dCMV5ybLk5FsK2ILSa33AaDSNlGbAgMBAAGjggKC
-MIICfjAOBgNVHQ8BAf8EBAMCBaAwHQYDVR0lBBYwFAYIKwYBBQUHAwEGCCsGAQUFBwMCMAwGA1Ud
-EwEB/wQCMAAwHQYDVR0OBBYEFKn3is2zseaH5yJYC7FRtoNeALRRMB8GA1UdIwQYMBaAFKhKamME
-fd265tE5t6ZFZe/zqOyhMG8GCCsGAQUFBwEBBGMwYTAuBggrBgEFBQcwAYYiaHR0cDovL29jc3Au
-aW50LXgzLmxldHNlbmNyeXB0Lm9yZzAvBggrBgEFBQcwAoYjaHR0cDovL2NlcnQuaW50LXgzLmxl
-dHNlbmNyeXB0Lm9yZy8wOQYDVR0RBDIwMIIuZGlnaXRhbHNreS11YXQuY2VudHJhbGluZGlhLmNs
-b3VkYXBwLmF6dXJlLmNvbTBMBgNVHSAERTBDMAgGBmeBDAECATA3BgsrBgEEAYLfEwEBATAoMCYG
-CCsGAQUFBwIBFhpodHRwOi8vY3BzLmxldHNlbmNyeXB0Lm9yZzCCAQMGCisGAQQB1nkCBAIEgfQE
-gfEA7wB1ACk8UZZUyDlluqpQ/FgH1Ldvv1h6KXLcpMMM9OVFR/R4AAABaQAhoBcAAAQDAEYwRAIg
-PlfZa6coMhYGYeeNYP21IIhC96X4IaGLGsIRu8/JhpwCID3doz3YgJK7nejtXxQAO+BmGG/ZxN6M
-tbR5otcvoK5NAHYA4mlLribo6UAJ6IYbtjuD1D7n/nSI+6SPKJMBnd3x2/4AAAFpACGhwQAABAMA
-RzBFAiEA++Ye0Elogdze8esT60rBXfnTt3PumfUAIsSTeo8LfCECIHUPXazfcWXJoBFxe2FwNYJ8
-fpLagb3ZCZO+0I0VerE+MA0GCSqGSIb3DQEBCwUAA4IBAQBASUIlMHx7L0vje0rViGre2qmLbh4r
-P88IbP553BTb9Tc8CORa7h4/orryMTHFEixhCH2fAuXoOHwbMEauQVgfLmT6PsJXatfRA8erOYi4
-B2QGlxV9budCZtdYGvLQLpwwiJkBg678zS3qmtO2gJK0xcVbUJlcXE/J/oTRxO/kMOlC4fuaw6Zx
-C4QBchhJR+8ysa5gjzU+Ata46wZ18We61y0IeZIfedv4/d4DJTx8O7mvo996SdimoH2+F/0QE9Pu
-jZ4wPzyPzRK/ALNR9avVmYHirGFk4n2AOATRRN7FHKdy9oAGLM0z5y/RFbUHeWU9TX3fmVR6054M
-tKQzto2N</X509Certificate></X509Data></KeyInfo></Signature></UAPermission>
+<UAPermission lastUpdated="" permissionArtifactId="" ttl="" txnId=""><Permission><Owner operatorId=""><Pilot uaplNo="" validTo=""/></Owner><FlightDetails><UADetails uinNo="12345678"/><FlightPurpose frequency="" shortDesc="Provisional test"/><PayloadDetails payloadDetails="Not specified" payloadWeight="Not specified"/><FlightParameters flightEndTime="2019-08-14T20:16:29.539147+05:30" flightStartTime="2019-08-14T19:16:29.539147+05:30" frequenciesUsed=""><Coordinates><Coordinate latitude="26.512081" longitude="80.224052"/><Coordinate latitude="26.512564" longitude="80.224045"/><Coordinate latitude="26.512573" longitude="80.224518"/><Coordinate latitude="26.512087" longitude="80.224541"/><Coordinate latitude="26.512081" longitude="80.224052"/></Coordinates></FlightParameters></FlightDetails></Permission><Signature xmlns="http://www.w3.org/2000/09/xmldsig#"><SignedInfo><CanonicalizationMethod Algorithm="http://www.w3.org/2006/12/xml-c14n11"/><SignatureMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"/><Reference URI=""><Transforms><Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/><Transform Algorithm="http://www.w3.org/2006/12/xml-c14n11"/></Transforms><DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"/><DigestValue>dfB+OFfkZQ0y3vfQK3VTEszXKhA0itboKBYm5q3VtTk=</DigestValue></Reference></SignedInfo><SignatureValue>Lrw0qK79AaGnIAHg+/fJxC3u9pBb58lZKTFw/pTPKkxem/10gML7TKSZ2j2uzQj4NEq+10T+xd5/JNF+VD32tLc4yfSIiOmOM+OoU0NH6gDbjgsGnebAx76/6RO8aM5TUj10GrfDMm4IMuAU46Mmvcdye3x+OmF/ptcUUwlbxw4vuEpC/HvDEc/pbCL9ehYCEY0LJjlNqG9NY6LR2V/VsGJMJgc75gypS89ak+Uo/pvJC+JLMhiY4hxN7NOuVHOnuEC13XLgxnDHqnM/A7BIFybnsHKgV4LFEB4j39zO/eiGwZp13SqZVqYK5gmkmgCq2kuYbxnHstGQQFG18KMGAg==</SignatureValue><KeyInfo><X509Data><X509Certificate>MIIC8TCCAdmgAwIBAgIJAJRDnqfLydHvMA0GCSqGSIb3DQEBCwUAMA8xDTALBgNV
+BAMMBHRlc3QwHhcNMTkwMzI2MDcxMTQzWhcNMjkwMzIzMDcxMTQzWjAPMQ0wCwYD
+VQQDDAR0ZXN0MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAq51cjR/m
+cgd0nWO33O3SM84yu3DRdaG8OMYSqzPixY5R+D8niOTVLZvOtaFROSneP1JmUAca
+Bn5sFhsFxgpJX8O6ee0m9PqLL+LKjexEs5dZ85IG8GqF+UJABaKfBeTPOgI5NAwo
+yZPBphzxsra1fH2OV2roaCf4ErMnYluuyey/VfFlHTVgC5+VX2wvO+o6pYUuzdNq
+CvgYwZrMEDCXm+08iZk/qpLgqgUCQTs8qGu/Y0d/EqwGmv9xN8tyxX+IbaeQM7uz
+tN8PbMf8wY40OqdgNmgaVmMR4mfAO2XJiryR5Y8JACDGf3dhmcDrdtfmNjaHR109
+o2/wUPhSdWB/3QIDAQABo1AwTjAdBgNVHQ4EFgQUR4p2KJJXG5cZ8STI66RG6l2o
+7yowHwYDVR0jBBgwFoAUR4p2KJJXG5cZ8STI66RG6l2o7yowDAYDVR0TBAUwAwEB
+/zANBgkqhkiG9w0BAQsFAAOCAQEAV3uurlHMtyopefBpdGj59eLWCrpRYJLKbDtL
+FCj+tY1/uiwogUMNsEEHEBeEdwM+PIPuzWZ4tSYQ+SvdCCt4/6e9x+c2/1mZKhnR
+zL/s9o70RyWZXQO+Dz43B5aIIy/qARUhLxU2NVL42q90pInIh/ltT02IVkcibwDn
+sM4XJhsSyvQlRyYXdPzDeBjEOVYFpafLbC/7a5FBuNwfNKEMWhOj6AELnC8fWb3m
+aNevhjSH5amGU2XrUp6yIdWUL2HuW7ReSer93Lg6iYujd/aaqk+pWE5bQsC+r2kH
+pNcpntHJLsd9E1cwzWCJiEM9zK4GXqKV/QDUdPC6FYfEf+ti9A==
+</X509Certificate></X509Data></KeyInfo></Signature></UAPermission>
