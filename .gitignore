@@ -5,3 +5,5 @@
 build/
 .DS_Store
 test/test_ifaces
+*.cproject
+*.project

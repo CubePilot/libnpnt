@@ -73,11 +73,7 @@ int8_t npnt_set_permart(npnt_s *handle, uint8_t *permart, uint16_t permart_lengt
     handle->fence.nverts = ret;
     ret = 0;
 
-    //Get Max Altitude
-    ret = npnt_get_max_altitude(handle, &handle->fence.maxAltitude);
-    if (ret < 0) {
-        return NPNT_INV_BAD_ALT;
-    }
+    // Max alt has been removed for new PA
 
     //Set Flight Params from artefact
     ret = npnt_populate_flight_params(handle);
@@ -107,10 +103,10 @@ int8_t npnt_verify_permart(npnt_s *handle)
     char last_empty_element[20];
     int8_t ret = 0;
     
-    reset_sha1();
+    reset_sha256();
     
     //Digest Signed Info
-    update_sha1("<SignedInfo xmlns=\"http://www.w3.org/2000/09/xmldsig#\">", 
+    update_sha256("<SignedInfo xmlns=\"http://www.w3.org/2000/09/xmldsig#\">",
                 strlen("<SignedInfo xmlns=\"http://www.w3.org/2000/09/xmldsig#\">"));
     signed_info = strstr(handle->raw_permart, "<SignedInfo>") + strlen("<SignedInfo>");
     if (signed_info == NULL) {
@@ -141,8 +137,8 @@ int8_t npnt_verify_permart(npnt_s *handle)
         if (strlen(last_empty_element) != 0) {
             if (signed_info[curr_ptr] == '/') {
                 if (signed_info[curr_ptr + 1] == '>') {
-                    update_sha1("></", 3);
-                    update_sha1(last_empty_element, strlen(last_empty_element));
+                    update_sha256("></", 3);
+                    update_sha256(last_empty_element, strlen(last_empty_element));
                     last_empty_element[0] = '\0';
                     curr_ptr += curr_length;
                     continue;
@@ -150,10 +146,10 @@ int8_t npnt_verify_permart(npnt_s *handle)
             }
         }
 
-        update_sha1(&signed_info[curr_ptr], curr_length);
+        update_sha256(&signed_info[curr_ptr], curr_length);
         curr_ptr += curr_length;
     }
-    final_sha1(digest_value);
+    final_sha256(digest_value);
 
     //fetch SignatureValue from xml
     signature = (const uint8_t*)mxmlGetOpaque(mxmlFindElement(handle->parsed_permart, handle->parsed_permart, "SignatureValue", NULL, NULL, MXML_DESCEND));
@@ -164,13 +160,13 @@ int8_t npnt_verify_permart(npnt_s *handle)
     signature_len = strlen(signature);
     raw_signature = base64_decode(signature, signature_len, &raw_signature_len);
     //Check authenticity of the artifact
-    if (npnt_check_authenticity(handle, digest_value, 20, raw_signature, raw_signature_len) <= 0) {
+    if (npnt_check_authenticity(handle, digest_value, 32, raw_signature, raw_signature_len) <= 0) {
         ret = NPNT_INV_AUTH;
         goto fail;
     }
 
     //Digest Canonicalised Permission Artifact
-    raw_perm_without_sign = strstr(handle->raw_permart, "<UAPermission>");
+    raw_perm_without_sign = strstr(handle->raw_permart, "<UAPermission");
     if (raw_perm_without_sign == NULL) {
         ret = NPNT_INV_ART;
         goto fail;
@@ -185,7 +181,7 @@ int8_t npnt_verify_permart(npnt_s *handle)
     // test_str[permission_length] = '\0';
     // printf("\n RAW PERMISSION: \n%s", test_str);
 
-    reset_sha1();
+    reset_sha256();
     curr_ptr = 0;
     curr_length = 0;
     //Canonicalise Permission Artefact by converting Empty elements to start-end tag pairs
@@ -208,8 +204,8 @@ int8_t npnt_verify_permart(npnt_s *handle)
         if (strlen(last_empty_element) != 0) {
             if (raw_perm_without_sign[curr_ptr] == '/') {
                 if (raw_perm_without_sign[curr_ptr + 1] == '>') {
-                    update_sha1("></", 3);
-                    update_sha1(last_empty_element, strlen(last_empty_element));
+                    update_sha256("></", 3);
+                    update_sha256(last_empty_element, strlen(last_empty_element));
                     last_empty_element[0] = '\0';
                     curr_ptr += curr_length;
                     continue;
@@ -217,15 +213,15 @@ int8_t npnt_verify_permart(npnt_s *handle)
             }
         }
 
-        update_sha1(&raw_perm_without_sign[curr_ptr], curr_length);
+        update_sha256(&raw_perm_without_sign[curr_ptr], curr_length);
         curr_ptr += curr_length;
     }
 
     //Skip Signature for Digestion
     raw_perm_without_sign = strstr(handle->raw_permart, "</Signature>") + strlen("</Signature>");
-    update_sha1(raw_perm_without_sign, strlen(raw_perm_without_sign));
-    final_sha1(digest_value);
-    base64_digest_value = base64_encode(digest_value, 20, &base64_digest_value_len);
+    update_sha256(raw_perm_without_sign, strlen(raw_perm_without_sign)-6);
+    final_sha256(digest_value);
+    base64_digest_value = base64_encode(digest_value, 32, &base64_digest_value_len);
     // printf("\nDigest Value: \n%s\n", base64_digest_value);
     // printf("\nDigest Value: \n%s\n", mxmlGetOpaque(mxmlFindElement(handle->parsed_permart, handle->parsed_permart, "DigestValue", NULL, NULL, MXML_DESCEND)));
     
@@ -336,7 +332,7 @@ int8_t npnt_get_max_altitude(npnt_s* handle, float* altitude)
 int8_t npnt_ist_date_time_to_unix_time(const char* dt_string, struct tm* date_time)
 {
     char data[5] = {};
-    if (strlen(dt_string) != 19) {
+    if (strlen(dt_string) != 32) {
         return -1;
     }
     if (!date_time) {
@@ -347,7 +343,7 @@ int8_t npnt_ist_date_time_to_unix_time(const char* dt_string, struct tm* date_ti
     //read year
     memcpy(data, dt_string, 4);
     data[4] = '\0';
-    date_time->tm_year = atoi(data) - 1900;
+    date_time->tm_year = atoi(data);
     //read month
     memcpy(data, &dt_string[5], 2);
     data[2] = '\0';
@@ -359,11 +355,11 @@ int8_t npnt_ist_date_time_to_unix_time(const char* dt_string, struct tm* date_ti
     //read hour
     memcpy(data, &dt_string[11], 2);
     data[2] = '\0';
-    date_time->tm_hour = atoi(data) - 5; //also apply IST to UTC offset
+    date_time->tm_hour = atoi(data);
     //read minute
-    memcpy(data, &dt_string[14], 2); //also apply IST to UTC offset
+    memcpy(data, &dt_string[14], 2);
     data[2] = '\0';
-    date_time->tm_min = atoi(data) - 30;
+    date_time->tm_min = atoi(data);
     //read second
     memcpy(data, &dt_string[17], 2);
     data[2] = '\0';
@@ -407,15 +403,6 @@ int8_t npnt_populate_flight_params(npnt_s* handle)
         return NPNT_INV_FPARAMS;
     }
 
-    handle->params.adcNumber = npnt_get_attr(flight_params, "adcNumber");
-    if (!handle->params.adcNumber) {
-        return NPNT_INV_FPARAMS;
-    }
-
-    handle->params.ficNumber = npnt_get_attr(flight_params, "ficNumber");
-    if (!handle->params.ficNumber) {
-        return NPNT_INV_FPARAMS;
-    }
     if (npnt_ist_date_time_to_unix_time(mxmlElementGetAttr(flight_params, "flightEndTime"), &handle->params.flightEndTime) < 0) {
         return NPNT_INV_FPARAMS;
     }
