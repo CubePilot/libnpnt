@@ -49,7 +49,7 @@ static void remove_trailing_zeros(char* data)
 int npnt_log_common_data(npnt_s* handle, time_t unix_ts, float lat, float lon, float alt)
 {
     char data[40];
-    uint8_t ret = snprintf(data, 40, "\"timeStamp\":%ld,", unix_ts + IST_TIME_OFFSET);
+    uint8_t ret = snprintf(data, 40, "\"timeStamp\":%lld,", (long long int)(unix_ts + IST_TIME_OFFSET));
     if (ret >= 40 || ret <= 0) {
         return -1;
     }
