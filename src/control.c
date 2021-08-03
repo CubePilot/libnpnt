@@ -51,18 +51,31 @@ int8_t npnt_reset_handle(npnt_s *handle)
         free(handle->fence.vertlon);
     }
 
-    if (handle->flight_params.uinNo) {
-        handle->flight_params.uinNo = NULL;
+    if (handle->pa_params.id) {
+        free(handle->pa_params.id);
     }
 
+    if (handle->pa_params.operator_id) {
+        free(handle->pa_params.operator_id);
+    }
+
+    if (handle->flight_params.drone_id) {
+        free(handle->flight_params.drone_id);
+    }
+
+    if (handle->flight_params.uinNo) {
+        free(handle->flight_params.uinNo);
+    }
+
+#ifndef PERMART_SKIP_FPARAMS
     if (handle->flight_params.adcNumber) {
-        handle->flight_params.adcNumber = NULL;
+        free(handle->flight_params.adcNumber);
     }
 
     if (handle->flight_params.ficNumber) {
-        handle->flight_params.ficNumber = NULL;
+        free(handle->flight_params.ficNumber);
     }
-
+#endif
     memset(handle, 0, sizeof(npnt_s));
 
     return 0;

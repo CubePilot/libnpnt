@@ -197,3 +197,17 @@ uint8_t* base64_decode(const uint8_t *src, uint16_t len, uint16_t *out_len)
 	*out_len = pos - out;
 	return out;
 }
+
+// Converts bytes to hex string
+char* hexify(const uint8_t* bytes, uint32_t len)
+{
+    char* hex = malloc(len * 2 + 1);
+    if (!hex) {
+        return NULL;
+    }
+    for (uint32_t i = 0; i < len; i++) {
+        snprintf(hex + i * 2, 3, "%02x", bytes[i]);
+    }
+    hex[len * 2] = '\0';
+    return hex;
+}

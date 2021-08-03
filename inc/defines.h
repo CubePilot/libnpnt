@@ -41,8 +41,8 @@ typedef struct {
         uint16_t raw_permart_len;
         mxml_node_t *parsed_permart;
         npnt_sha_t pa_sha_handler;
-        uint8_t id[16];
-        uint8_t id_len;
+        char* id;
+        char* operator_id;
     } pa_params;
 
     struct {
@@ -53,6 +53,7 @@ typedef struct {
     } fence;
 
     struct {
+        char* drone_id;
         char* uinNo;
         char* adcNumber;
         char* ficNumber;
@@ -62,9 +63,9 @@ typedef struct {
 
     struct {
         bool log_started;
-        char last_loghash[DIGEST_VALUE_LEN];
+        uint8_t last_loghash[DIGEST_VALUE_LEN];
         int  log_fd;
-        char curr_loghash[DIGEST_VALUE_LEN];
+        uint8_t curr_loghash[DIGEST_VALUE_LEN];
         char base64_buffer[3];
         int8_t base64_buffer_idx;
         npnt_sha_t sha_handler;

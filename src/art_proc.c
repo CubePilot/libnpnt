@@ -69,6 +69,24 @@ int8_t npnt_set_permart(npnt_s *handle, uint8_t *permart, uint16_t permart_lengt
         return NPNT_PARSE_FAILED;
     }
 
+    // Get Permission Artifact Id
+    handle->pa_params.id = npnt_get_attr(handle->pa_params.parsed_permart, "permissionArtifactId");
+
+    if (handle->pa_params.id == NULL) {
+        // printf("Permart ID not found\n");
+        return NPNT_INV_ART;
+    }
+    // printf("Permart ID: %s\n", handle->pa_params.id);
+
+    // Get Operator Id
+    handle->pa_params.operator_id = npnt_get_attr(mxmlFindElement(handle->pa_params.parsed_permart, handle->pa_params.parsed_permart, "Owner", NULL, NULL, MXML_DESCEND), "operatorId");
+
+    if (handle->pa_params.operator_id == NULL) {
+        // printf("Permart ID not found\n");
+        return NPNT_INV_ART;
+    }
+
+
     //Verify Artifact against Sender's Public Key
     ret = npnt_verify_permart(handle);
     if (ret < 0) {
@@ -354,7 +372,7 @@ int8_t npnt_get_max_altitude(npnt_s* handle, float* altitude)
     return 0;
 }
 
-int8_t npnt_ist_date_time_to_unix_time(const char* dt_string, struct tm* date_time)
+int8_t npnt_art_date_time_to_unix_time(const char* dt_string, struct tm* date_time)
 {
     char data[5] = {};
     if (strlen(dt_string) < 19 && strlen(dt_string) > 40) {
@@ -380,11 +398,17 @@ int8_t npnt_ist_date_time_to_unix_time(const char* dt_string, struct tm* date_ti
     //read hour
     memcpy(data, &dt_string[11], 2);
     data[2] = '\0';
-    date_time->tm_hour = atoi(data) - 5; //also apply IST to UTC offset
+    date_time->tm_hour = atoi(data);
+#ifdef TIME_IST
+    date_time->tm_hour -= 5; //also apply IST to UTC offset
+#endif
     //read minute
-    memcpy(data, &dt_string[14], 2); //also apply IST to UTC offset
+    memcpy(data, &dt_string[14], 2);
     data[2] = '\0';
-    date_time->tm_min = atoi(data) - 30;
+    date_time->tm_min = atoi(data);
+#ifdef TIME_IST
+    date_time->tm_min -= 30; //also apply IST to UTC offset
+#endif
     //read second
     memcpy(data, &dt_string[17], 2);
     data[2] = '\0';
@@ -423,6 +447,11 @@ int8_t npnt_populate_flight_params(npnt_s* handle)
         return NPNT_INV_FPARAMS;
     }
 
+    handle->flight_params.drone_id = npnt_get_attr(ua_detail, "UUID");
+    if (!handle->flight_params.drone_id) {
+        return NPNT_INV_FPARAMS;
+    }
+
     handle->flight_params.uinNo = npnt_get_attr(ua_detail, "uinNo");
     if (!handle->flight_params.uinNo) {
         return NPNT_INV_FPARAMS;
@@ -443,10 +472,10 @@ int8_t npnt_populate_flight_params(npnt_s* handle)
     handle->flight_params.ficNumber = "00000RO";
 #endif
 
-    if (npnt_ist_date_time_to_unix_time(mxmlElementGetAttr(flight_params, "flightEndTime"), &handle->flight_params.flightEndTime) < 0) {
+    if (npnt_art_date_time_to_unix_time(mxmlElementGetAttr(flight_params, "flightEndTime"), &handle->flight_params.flightEndTime) < 0) {
         return NPNT_INV_FPARAMS;
     }
-    if (npnt_ist_date_time_to_unix_time(mxmlElementGetAttr(flight_params, "flightStartTime"), &handle->flight_params.flightStartTime) < 0) {
+    if (npnt_art_date_time_to_unix_time(mxmlElementGetAttr(flight_params, "flightStartTime"), &handle->flight_params.flightStartTime) < 0) {
         return NPNT_INV_FPARAMS;
     }
     return 0;
